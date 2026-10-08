@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urna Eleitoral 2026 - Junta Eleitoral</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #d1d8e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container-upload {
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .urna-container {
+            background-color: #dbd8cb;
+            display: flex;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            gap: 30px;
+        }
+
+        /* TELA DE EXIBIÇÃO DA URNA */
+        .tela {
+            width: 440px;
+            height: 320px;
+            background-color: #e8f0f8;
+            border: 2px solid #555;
+            border-radius: 5px;
+            padding: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .topo-tela {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .cargo-nome {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .area-numeros {
+            display: flex;
+            gap: 5px;
+            margin: 15px 0;
+        }
+
+        .caixa-numero {
+            width: 30px;
+            height: 40px;
+            border: 1px solid #000;
+            font-size: 24px;
+            text-align: center;
+            line-height: 40px;
+            background-color: #fff;
+        }
+
+        .caixa-numero.pisca {
+            animation: pisca 1s infinite;
+        }
+
+        @keyframes pisca {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .info-candidato {
+            font-size: 14px;
+            min-height: 90px;
+        }
+
+        .foto-candidato {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 90px;
+            height: 105px;
+            border: 1px solid #000;
+            object-fit: cover;
+            background-color: #ddd;
+        }
+
+        .instrucoes {
+            border-top: 1px solid #000;
+            padding-top: 5px;
+            font-size: 11px;
+        }
+
+        .tela-fim {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e8f0f8;
+            font-size: 60px;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* TECLADO DA URNA */
+        .teclado {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 8px;
+            width: 260px;
+        }
+
+        .topo-teclado {
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .teclas-numericas {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .teclas-numericas button {
+            background-color: #111;
+            color: #fff;
+            font-size: 20px;
+            height: 45px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 3px #000;
+        }
+
+        .teclas-numericas button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px #000;
+        }
+
+        .teclas-acoes {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .teclas-acoes button {
+            height: 40px;
+            font-size: 10px;
+            font-weight: bold;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .btn-branco { background-color: #ffffff; color: #000; width: 30%; }
+        .btn-corrige { background-color: #e74c3c; color: #fff; width: 30%; }
+        .btn-confirma { background-color: #2ecc71; color: #000; width: 35%; height: 50px !important; }
+
+        .painel-controle {
+            margin-top: 20px;
+        }
+
+        #btnEncerrar {
+            background-color: #2980b9;
+            color: #fff;
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #btnEncerrar:hover {
+            background-color: #1f618d;
+        }
+
+        /* MODAL DO BOLETIM DE URNA */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .btn-fechar {
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CARREGAMENTO DOS JSONS DOS PARTIDOS DOS INTEGRANTES -->
+    <div class="container-upload">
+        <h3>1. Integrar Partidos (Selecione os arquivos JSON do Grupo)</h3>
+        <input type="file" id="jsonFiles" multiple accept=".json">
+        <p id="statusCarregamento">Nenhum partido carregado ainda. Selecione os arquivos de candidaturas.</p>
+    </div>
+
+    <!-- ESTRUTURA FÍSICA DA URNA -->
+    <div class="urna-container">
+        
+        <!-- TELA DA URNA -->
+        <div class="tela">
+            <div class="conteudo-tela" id="conteudoTela">
+                <div class="topo-tela">SEU VOTO VAI PARA</div>
+                <div class="cargo-nome" id="cargoNome">DEPUTADO FEDERAL</div>
+                
+                <div class="area-numeros" id="areaNumeros"></div>
+
+                <div class="info-candidato" id="infoCandidato">
+                    <!-- Detalhes do candidato (Nome, Partido, Foto) -->
+                </div>
+
+                <div class="instrucoes">
+                    Aperte a tecla:<br>
+                    <strong>CONFIRMA</strong> para CONFIRMAR este voto<br>
+                    <strong>CORRIGE</strong> para REINICIAR este voto
+                </div>
+            </div>
+
+            <div class="tela-fim" id="telaFim">F I M</div>
+        </div>
+
+        <!-- TECLADO NUMÉRICO E DE AÇÕES -->
+        <div class="teclado">
+            <div class="topo-teclado">JUSTIÇA ELEITORAL</div>
+            
+            <div class="teclas-numericas">
+                <button onclick="pressionarNumero('1')">1</button>
+                <button onclick="pressionarNumero('2')">2</button>
+                <button onclick="pressionarNumero('3')">3</button>
+                <button onclick="pressionarNumero('4')">4</button>
+                <button onclick="pressionarNumero('5')">5</button>
+                <button onclick="pressionarNumero('6')">6</button>
+                <button onclick="pressionarNumero('7')">7</button>
+                <button onclick="pressionarNumero('8')">8</button>
+                <button onclick="pressionarNumero('9')">9</button>
+                <button onclick="pressionarNumero('0')">0</button>
+            </div>
+
+            <div class="teclas-acoes">
+                <button class="btn-branco" onclick="votarBranco()">BRANCO</button>
+                <button class="btn-corrige" onclick="corrigir()">CORRIGE</button>
+                <button class="btn-confirma" onclick="confirmar()">CONFIRMA</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PAINEL DO FISCAL DE URNA -->
+    <div class="painel-controle">
+        <button id="btnEncerrar" onclick="encerrarEApurar()">Encerra Votação & Gerar Boletim de Urna</button>
+    </div>
+
+    <!-- MODAL DO BOLETIM DE URNA (BÔNUS 1) -->
+    <div id="boletimModal" class="modal">
+        <div class="modal-content">
+            <h2>BOLETIM DE URNA - APURAÇÃO FINAL</h2>
+            <div id="relatorioConteudo"></div>
+            <button class="btn-fechar" onclick="baixarVotosEFechar()">Baixar Votos (votos.json) e Fechar Seção</button>
+        </div>
+    </div>
+
+    <script>
+        // --- FLUXO OFICIAL DAS ELEIÇÕES DE 2026 ---
+        const CARGOS = [
+            { nome: "Deputado Federal", digitos: 4 },
+            { nome: "Deputado Estadual", digitos: 5 },
+            { nome: "Senador", digitos: 3 },
+            { nome: "Governador", digitos: 2 },
+            { nome: "Presidente", digitos: 2 }
+        ];
+
+        let cargoAtualIndex = 0;
+        let numeroDigitado = "";
+        let votoBranco = false;
+
+        let baseCandidatos = []; // Candidatos unificados de todos os JSONs do grupo
+        let registrosDeVotos = []; // Armazena os votos consolidados por eleitor
+        let votoAtualEleitor = {}; // Guarda os votos do eleitor ativo
+
+        // Carregar e integrar múltiplos arquivos JSON
+        document.getElementById('jsonFiles').addEventListener('change', async (event) => {
+            const files = event.target.files;
+            baseCandidatos = [];
+
+            for (let file of files) {
+                try {
+                    const text = await file.text();
+                    const json = JSON.parse(text);
+                    baseCandidatos = baseCandidatos.concat(json);
+                } catch (err) {
+                    console.error(`Erro ao carregar o arquivo ${file.name}:`, err);
+                }
+            }
+
+            document.getElementById('statusCarregamento').textContent = 
+                `${files.length} partido(s) integrado(s) com sucesso. Total de ${baseCandidatos.length} candidato(s) cadastrados.`;
+            
+            iniciarVotacao();
+        });
+
+        function iniciarVotacao() {
+            cargoAtualIndex = 0;
+            votoAtualEleitor = {};
+            numeroDigitado = "";
+            votoBranco = false;
+            atualizarTela();
+        }
+
+        function atualizarTela() {
+            const cargo = CARGOS[cargoAtualIndex];
+            document.getElementById('cargoNome').textContent = cargo.nome.toUpperCase();
+            document.getElementById('infoCandidato').innerHTML = '';
+            
+            // Renderização dos dígitos
+            const areaNumeros = document.getElementById('areaNumeros');
+            areaNumeros.innerHTML = '';
+            
+            for (let i = 0; i < cargo.digitos; i++) {
+                const div = document.createElement('div');
+                div.className = 'caixa-numero';
+                if (i < numeroDigitado.length) {
+                    div.textContent = numeroDigitado[i];
+                } else if (i === numeroDigitado.length && !votoBranco) {
+                    div.classList.add('pisca');
+                }
+                areaNumeros.appendChild(div);
+            }
+
+            if (votoBranco) {
+                document.getElementById('infoCandidato').innerHTML = '<h2 style="color: #27ae60; margin-top: 10px;">VOTO EM BRANCO</h2>';
+                return;
+            }
+
+            // Procura candidato ao completar a quantidade de dígitos do cargo
+            if (numeroDigitado.length === cargo.digitos) {
+                const candidato = baseCandidatos.find(c => 
+                    c.cargo.toLowerCase() === cargo.nome.toLowerCase() && 
+                    String(c.numero) === String(numeroDigitado)
+                );
+                
+                if (candidato) {
+                    document.getElementById('infoCandidato').innerHTML = `
+                        <img src="${candidato.foto}" class="foto-candidato" alt="Foto Candidato" onerror="this.style.display='none'">
+                        <strong>Nome:</strong> ${candidato.nome}<br>
+                        <strong>Partido:</strong> ${candidato.numero.substring(0, 2)}
+                    `;
+                } else {
+                    document.getElementById('infoCandidato').innerHTML = '<h2 style="color: #c0392b; margin-top: 10px;">VOTO NULO</h2>';
+                }
+            }
+        }
+
+        function pressionarNumero(num) {
+            if (votoBranco) return;
+            const cargo = CARGOS[cargoAtualIndex];
+            if (numeroDigitado.length < cargo.digitos) {
+                numeroDigitado += num;
+                tocarSomTecla();
+                atualizarTela();
+            }
+        }
+
+        function votarBranco() {
+            if (numeroDigitado === "") {
+                votoBranco = true;
+                tocarSomTecla();
+                atualizarTela();
+            }
+        }
+
+        function corrigir() {
+            numeroDigitado = "";
+            votoBranco = false;
+            tocarSomTecla();
+            atualizarTela();
+        }
+
+        function confirmar() {
+            const cargo = CARGOS[cargoAtualIndex];
+
+            if (numeroDigitado.length === cargo.digitos || votoBranco) {
+                let tipoVoto = "VALIDO";
+                const candidato = baseCandidatos.find(c => 
+                    c.cargo.toLowerCase() === cargo.nome.toLowerCase() && 
+                    String(c.numero) === String(numeroDigitado)
+                );
+
+                if (votoBranco) {
+                    tipoVoto = "BRANCO";
+                } else if (!candidato) {
+                    tipoVoto = "NULO";
+                }
+
+                votoAtualEleitor[cargo.nome] = {
+                    numero: votoBranco ? "BRANCO" : numeroDigitado,
+                    nome: candidato ? candidato.nome : (votoBranco ? "VOTO BRANCO" : "VOTO NULO"),
+                    tipo: tipoVoto
+                };
+
+                cargoAtualIndex++;
+
+                if (cargoAtualIndex < CARGOS.length) {
+                    tocarSomTecla();
+                    numeroDigitado = "";
+                    votoBranco = false;
+                    atualizarTela();
+                } else {
+                    // Conclusão da votação do eleitor
+                    registrosDeVotos.push({ eleitor: registrosDeVotos.length + 1, votos: votoAtualEleitor });
+                    
+                    tocarSomPilili(); // BÔNUS 2: Reprodução do som do "pilili"
+                    
+                    document.getElementById('conteudoTela').style.display = 'none';
+                    document.getElementById('telaFim').style.display = 'flex';
+
+                    // Reseta a interface após alguns segundos para o próximo eleitor
+                    setTimeout(() => {
+                        document.getElementById('telaFim').style.display = 'none';
+                        document.getElementById('conteudoTela').style.display = 'block';
+                        iniciarVotacao();
+                    }, 3000);
+                }
+            }
+        }
+
+        // ⭐️ BÔNUS 2: Áudio do "Pilili" via Web Audio API (sem arquivos de áudio externos)
+        function tocarSomTecla() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.05);
+            } catch (e) {
+                console.warn("Áudio não suportado ou bloqueado pelo navegador.");
+            }
+        }
+
+        function tocarSomPilili() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(800, now + 0.15);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } catch (e) {
+                console.warn("Áudio não suportado ou bloqueado pelo navegador.");
+            }
+        }
+
+        // ⭐️ BÔNUS 1: Apuração e Exibição do Boletim de Urna
+        function encerrarEApurar() {
+            if (registrosDeVotos.length === 0) {
+                alert("Nenhum voto foi registrado até o momento!");
+                return;
+            }
+
+            let apuracao = {};
+
+            CARGOS.forEach(c => {
+                apuracao[c.nome] = { brancos: 0, nulos: 0, candidatos: {} };
+            });
+
+            registrosDeVotos.forEach(reg => {
+                for (let cargo in reg.votos) {
+                    let v = reg.votos[cargo];
+                    if (v.tipo === "BRANCO") {
+                        apuracao[cargo].brancos++;
+                    } else if (v.tipo === "NULO") {
+                        apuracao[cargo].nulos++;
+                    } else {
+                        let chave = `${v.nome} (${v.numero})`;
+                        apuracao[cargo].candidatos[chave] = (apuracao[cargo].candidatos[chave] || 0) + 1;
+                    }
+                }
+            });
+
+            // Construção do HTML do Boletim
+            let html = `<p><strong>Total de Eleitores:</strong> ${registrosDeVotos.length}</p><hr>`;
+            
+            for (let cargo in apuracao) {
+                html += `<h4 style="margin-bottom: 5px;">${cargo.toUpperCase()}</h4><ul style="margin-top: 5px;">`;
+                html += `<li><strong>Votos Brancos:</strong> ${apuracao[cargo].brancos}</li>`;
+                html += `<li><strong>Votos Nulos:</strong> ${apuracao[cargo].nulos}</li>`;
+                for (let cand in apuracao[cargo].candidatos) {
+                    html += `<li><strong>${cand}:</strong> ${apuracao[cargo].candidatos[cand]} voto(s)</li>`;
+                }
+                html += `</ul>`;
+            }
+
+            document.getElementById('relatorioConteudo').innerHTML = html;
+            document.getElementById('boletimModal').style.display = 'flex';
+        }
+
+        function baixarVotosEFechar() {
+            // Exporta o arquivo votos.json com o detalhamento voto a voto
+            const jsonData = JSON.stringify(registrosDeVotos, null, 2);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'votos.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            document.getElementById('boletimModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

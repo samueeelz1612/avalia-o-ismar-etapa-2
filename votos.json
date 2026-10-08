@@ -1,0 +1,32 @@
+[
+  {
+    "eleitor": 1,
+    "votos": {
+      "Deputado Federal": {
+        "numero": "9413",
+        "nome": "Magali",
+        "tipo": "VALIDO"
+      },
+      "Deputado Estadual": {
+        "numero": "94123",
+        "nome": "Chico Bento",
+        "tipo": "VALIDO"
+      },
+      "Senador": {
+        "numero": "941",
+        "nome": "Cebolinha",
+        "tipo": "VALIDO"
+      },
+      "Governador": {
+        "numero": "94",
+        "nome": "Mônica",
+        "tipo": "VALIDO"
+      },
+      "Presidente": {
+        "numero": "94",
+        "nome": "VOTO NULO",
+        "tipo": "NULO"
+      }
+    }
+  }
+]
